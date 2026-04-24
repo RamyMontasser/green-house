@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(360, 690),
-      minTextAdapt: true,
+       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_ , child) {
         return MediaQuery(
