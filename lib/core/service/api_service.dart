@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:green_house/feature/data/models/sensor_model.dart';
 
@@ -28,9 +29,7 @@ class ApiService {
     try {
       await _dio.post(
         '$url/api/Greenhouse/auto-control-enable',
-        queryParameters: {
-          'Enable': enabled,
-        },
+        queryParameters: {'Enable': enabled},
       );
     } catch (e) {
       throw Exception("خطأ في تغيير وضع التحكم التلقائي: $e");
@@ -39,7 +38,7 @@ class ApiService {
 
   Future<void> updateThresholds(SensorModel config) async {
     try {
-      await _dio.post(
+      await _dio.put(
         '$url/api/Greenhouse/auto-control-update',
         data: config.toJson(),
         options: Options(headers: {'Content-Type': 'application/json'}),
@@ -52,7 +51,10 @@ class ApiService {
   Future<Map<String, dynamic>> predictLeafDisease(String imagePath) async {
     try {
       FormData formData = FormData.fromMap({
-        "file": await MultipartFile.fromFile(imagePath, filename: imagePath.split('/').last),
+        "file": await MultipartFile.fromFile(
+          imagePath,
+          filename: imagePath.split('/').last,
+        ),
       });
 
       final response = await _dio.post(
@@ -60,7 +62,10 @@ class ApiService {
         data: formData,
       );
 
-      return response.data;
+      if (response.data is String) {
+        return jsonDecode(response.data) as Map<String, dynamic>;
+      }
+      return response.data as Map<String, dynamic>;
     } catch (e) {
       throw Exception("خطأ في تصنيف المرض: $e");
     }
